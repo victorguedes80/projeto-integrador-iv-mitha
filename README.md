@@ -248,17 +248,17 @@ data/processed/
 Desenvolvimento dos modelos
 ```
 
-## Milestones
+## Entregas
 
 O desenvolvimento do projeto é organizado de forma incremental ao longo da disciplina.
 
-### M1 — Problem & Dataset
+### M1 - Problem & Dataset
 
 - Definição do problema;
 - Seleção e descrição do dataset;
 - Definição da hipótese inicial.
 
-### M2 — First Model
+### M2 - First Model
 
 - Exploração dos dados;
 - Pré-processamento dos dados;
@@ -266,25 +266,25 @@ O desenvolvimento do projeto é organizado de forma incremental ao longo da disc
 - Desenvolvimento do primeiro modelo de Inteligência Computacional;
 - Avaliação dos resultados iniciais.
 
-### M3 — Model Validation
+### M3 - Model Validation
 
 - Avaliação experimental;
 - Análise de erros;
 - Seleção do modelo.
 
-### M4 — IoT Architecture
+### M4 - IoT Architecture
 
 - Definição dos sensores;
 - Comunicação;
 - Arquitetura Edge/Cloud.
 
-### M5 — Prototype
+### M5 - Prototype
 
 - Desenvolvimento do hardware;
 - Comunicação;
 - Aquisição de dados.
 
-### M6 — Final Demonstration
+### M6 - Final Demonstration
 
 - Integração do sistema;
 - Validação;
@@ -292,12 +292,12 @@ O desenvolvimento do projeto é organizado de forma incremental ao longo da disc
 
 ## Equipe
 
-- **Victor Guedes Alves Teixeira**
 - **Anderson Moura Costa do Nascimento**
 - **Matheus Simão Sales**
+- **Victor Guedes Alves Teixeira**
 
 ## Instituição
 
-**Universidade Federal do Ceará — UFC**
+**Universidade Federal do Ceará - UFC**
 **Curso de Engenharia de Computação**
 **Projeto Integrador IV**
