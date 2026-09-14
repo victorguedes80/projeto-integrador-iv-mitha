@@ -9,6 +9,9 @@ __pycache__/
 .venv/
 venv/
 env/
+*.lock
+*.toml
+*.mmd
 
 # Jupyter
 .ipynb_checkpoints/
@@ -44,3 +47,4 @@ Desktop.ini
 
 .vscode/
 .idea/
+
