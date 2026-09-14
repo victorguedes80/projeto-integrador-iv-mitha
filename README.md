@@ -299,5 +299,7 @@ O desenvolvimento do projeto é organizado de forma incremental ao longo da disc
 ## Instituição
 
 **Universidade Federal do Ceará - UFC**
+
 **Curso de Engenharia de Computação**
+
 **Projeto Integrador IV**
