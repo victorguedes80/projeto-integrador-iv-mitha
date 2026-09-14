@@ -1,0 +1,17 @@
+variavel,descricao,count,missing,missing_%,mean,median,std,min,q25,q75,max,n_unique
+env_temperature,Temperatura do ar (°C),46635,0,0.0,26.659,25.5,6.4939,13.5,21.3,32.2,41.2,275
+env_humidity,Umidade do ar (%),46625,10,0.02,67.2202,66.0,18.8045,24.0,51.0,82.0,100.0,76
+env_co2,CO2 (ppm),46635,0,0.0,493.7551,483.0,53.4218,396.0,458.0,512.0,814.0,343
+env_pressure,Pressão barométrica (hPa),29105,17530,37.59,1008.2214,1008.2,3.0137,1000.8,1006.1,1010.6,1015.2,145
+soil_temperature,Temperatura do solo (°C),46622,13,0.03,24.951,24.95,1.4615,12.2,23.9,26.05,43.0,278
+soil_humidity,Umidade do solo (%),46622,13,0.03,24.4363,25.35,6.5838,0.0,19.13,28.755,338.04,5037
+soil_ec,Condutividade elétrica do solo (µS/cm),46622,13,0.03,344.1261,339.0,268.8094,0.0,235.0,447.375,32906.0,1523
+valve_state,"Estado da válvula (0=fechada, 1=aberta)",46218,417,0.89,0.015,0.0,0.1217,0.0,0.0,0.0,1.0,2
+water_volume,Volume acumulado (m³),46323,312,0.67,7416.8032,6694.0,7205.5178,0.0,1.0,13208.0,33318.0,736
+gdd,Graus-dia acumulados (GDD),46635,0,0.0,1259.895,1253.2,355.2655,688.0,935.2,1567.2,1876.2,71
+daily_mean_temperature,Temperatura média diária (°C),46635,0,0.0,27.2017,28.0,2.9728,16.8,25.3,29.6,31.6,54
+sdd,Standard Day Degree (°C),46635,0,0.0,17.2003,18.0,2.9724,6.8,15.3,19.6,21.7,52
+ontario_units,Ontario Units (°C),46635,0,0.0,27.2047,27.0,1.5024,12.0,26.2,28.2,30.9,37
+daily_max,Temperatura máxima diária (°C),46635,0,0.0,35.6668,37.1,4.2969,20.2,33.5,38.7,41.2,58
+daily_max_above_tbase,Máx acima da base (°C),46635,0,0.0,25.6668,27.1,4.2969,10.2,23.5,28.7,31.2,58
+daily_max_reduction,Máx com cutoff (°C),46635,0,0.0,17.052,16.5,2.725,10.2,15.0,19.6,22.0,57

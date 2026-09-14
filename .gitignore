@@ -1,0 +1,46 @@
+# =========================
+# Python
+# =========================
+
+__pycache__/
+*.py[cod]
+
+# Ambientes virtuais
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# =========================
+# Dataset
+# =========================
+
+# Dados brutos baixados do Mendeley
+data/raw/2023/*
+data/raw/2024/*
+data/raw/2025/*
+
+# Mantém arquivos de documentação dentro das pastas
+!data/raw/2023/README.md
+!data/raw/2024/README.md
+!data/raw/2025/README.md
+
+# =========================
+# Sistema operacional
+# =========================
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# =========================
+# IDEs
+# =========================
+
+.vscode/
+.idea/
