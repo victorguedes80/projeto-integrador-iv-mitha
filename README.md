@@ -23,7 +23,7 @@ Inicialmente, o problema será abordado como uma tarefa de **classificação bin
 
 O conjunto de dados utilizado inicialmente no desenvolvimento do modelo está disponível no **Mendeley Data**:
 
-https://data.mendeley.com/datasets/35wh56287y/2
+https://data.mendeley.com/datasets/h8sfcf9487/1
 
 O dataset contém dados obtidos em um cultivo de tomate e será utilizado como base experimental inicial para o desenvolvimento do modelo de Inteligência Computacional.
 
