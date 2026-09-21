@@ -259,7 +259,7 @@ Desenvolvimento dos modelos
 
 O desenvolvimento do projeto é organizado de forma incremental ao longo da disciplina.
 
-### M1 - Problem & Dataset
+### M1 - Problem & Dataset (Concluído)
 
 - Definição do problema;
 - Seleção e descrição do dataset;
