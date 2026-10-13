@@ -16,6 +16,10 @@ env/
 # Jupyter
 .ipynb_checkpoints/
 
+# ainda fazendo
+/notebooks/analis.ipynb
+/src/data/converter_timestamp_2024.py
+/data/processed/soil2024_com_data_horario.csv
 # =========================
 # Dataset
 # =========================

@@ -1,0 +1,4 @@
+Dado soil2024.csv de 2024
+linha 3:
+dispositivo 2f2ba968948ac82e9517eddb42fc1043d211d6da9f0725cd47ce2fb995701b92: dispositivo 1
+dispositivo 901b4b4b92f53023e62436410e7a000efb07750ba9bcb40327dd2a56a8259947: dispositivo 2
