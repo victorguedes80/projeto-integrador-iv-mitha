@@ -4,7 +4,7 @@ from pathlib import Path
 import paho.mqtt.client as mqtt
 
 PORTA = 1883
-BROKER = "10.173.12.163"
+BROKER = "10.43.101.163"
 TOPICO = "irrigacao/esp32-01/dados"
 
 # Caminho do arquivo de registros
