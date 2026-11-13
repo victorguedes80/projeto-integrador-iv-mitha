@@ -1,0 +1,49 @@
+{
+  "versao": "v3",
+  "executado_em": "2026-11-11T16:02:40.462704+00:00",
+  "regras": {
+    "DT_MIN": 10,
+    "MAX_GAP_INTERP": 2,
+    "MAX_GAP_VAZAO": 3,
+    "JANELA_CONTADOR": 3,
+    "TOL_CONTADOR": 200,
+    "GAP_EVENTO": 2,
+    "DUR_MIN_EVENTO": 3,
+    "FATOR_GLITCH_VAZAO": 5,
+    "BASELINE_MIN": 60,
+    "PICO_APOS_FECHAR": 12,
+    "DY_MIN": 1.5,
+    "N_MIN_DEGRAU": 6,
+    "N_MIN_EVENTO": 12,
+    "FRAC_INTERP_MAX": 0.2,
+    "FRAC_INTERP_BOA": 0.1,
+    "PICOS_MAX_BOA": 1,
+    "REC_MAX": 72,
+    "REC_N_MIN": 18,
+    "RES_TEMPORAL": 10,
+    "R2_BOA": 0.9,
+    "NRMSE_BOA": 0.1,
+    "SE_REL_MAX": 1.0,
+    "CORR_MAX": 0.95,
+    "DAICC": 2.0
+  },
+  "tratamentos": {
+    "2023": {
+      "1": "I100",
+      "2": "I60",
+      "3": "I30"
+    },
+    "2024": {
+      "1": "Î80",
+      "2": "Î60",
+      "3": "A(sh)",
+      "4": "Î100",
+      "5": "Î30"
+    }
+  },
+  "tratamentos_confianca": {
+    "2023": "provável (volumes; ordem da Fig. 1)",
+    "2024": "provável (Fig. 1 + volumes + padrão de pulsos em L3)"
+  },
+  "fonte": "data/processed/dataset_m2_{2023,2024,2025}.csv"
+}

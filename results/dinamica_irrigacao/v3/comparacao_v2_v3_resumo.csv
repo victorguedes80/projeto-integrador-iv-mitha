@@ -1,0 +1,55 @@
+item,valor
+eventos em ambas (ajustados nas duas),191.0
+só v2,0.0
+só v3,0.0
+mediana M1_theta_v2,28.19943261137969
+mediana D1_theta_v3,35.29100945065704
+mediana M1_tau_v2,23.49630807402925
+mediana D1_tau_v3,35.18805849759535
+mediana t63_v2,42.13689839572194
+mediana t63_v3,43.85066666666666
+mediana atraso_5pct_v2,25.590935797457547
+mediana atraso_5pct_v3,25.855731225296427
+mediana d_theta_degrau,0.0
+mediana d_tau_degrau,0.0
+mediana d_t63,0.060769230769228244
+classe_subida_v2 = 1a ordem | classe_degrau_v3 = 1a ordem,86.0
+classe_subida_v2 = 1a ordem | classe_degrau_v3 = 2a ordem,5.0
+classe_subida_v2 = 1a ordem | classe_degrau_v3 = indistinto,3.0
+classe_subida_v2 = 2a ordem | classe_degrau_v3 = 1a ordem,0.0
+classe_subida_v2 = 2a ordem | classe_degrau_v3 = 2a ordem,5.0
+classe_subida_v2 = 2a ordem | classe_degrau_v3 = indistinto,1.0
+classe_subida_v2 = indistinto | classe_degrau_v3 = 1a ordem,2.0
+classe_subida_v2 = indistinto | classe_degrau_v3 = 2a ordem,4.0
+classe_subida_v2 = indistinto | classe_degrau_v3 = indistinto,6.0
+classe_subida_v2 = 1a ordem | classe_ar1_v3 = 1 polo + componente rápida,71.0
+classe_subida_v2 = 1a ordem | classe_ar1_v3 = 1a ordem,29.0
+classe_subida_v2 = 1a ordem | classe_ar1_v3 = 2a ordem (com zero),37.0
+classe_subida_v2 = 1a ordem | classe_ar1_v3 = 2a ordem (série),6.0
+classe_subida_v2 = 1a ordem | classe_ar1_v3 = indistinto,29.0
+classe_subida_v2 = 2a ordem | classe_ar1_v3 = 1 polo + componente rápida,1.0
+classe_subida_v2 = 2a ordem | classe_ar1_v3 = 1a ordem,0.0
+classe_subida_v2 = 2a ordem | classe_ar1_v3 = 2a ordem (com zero),3.0
+classe_subida_v2 = 2a ordem | classe_ar1_v3 = 2a ordem (série),1.0
+classe_subida_v2 = 2a ordem | classe_ar1_v3 = indistinto,1.0
+classe_subida_v2 = indistinto | classe_ar1_v3 = 1 polo + componente rápida,0.0
+classe_subida_v2 = indistinto | classe_ar1_v3 = 1a ordem,5.0
+classe_subida_v2 = indistinto | classe_ar1_v3 = 2a ordem (com zero),3.0
+classe_subida_v2 = indistinto | classe_ar1_v3 = 2a ordem (série),1.0
+classe_subida_v2 = indistinto | classe_ar1_v3 = indistinto,3.0
+classe_recessao_v2 = dupla | classe_recessao_ar1_v3 = dupla,60.0
+classe_recessao_v2 = dupla | classe_recessao_ar1_v3 = dupla (lenta não identificável),1.0
+classe_recessao_v2 = dupla | classe_recessao_ar1_v3 = indistinto,0.0
+classe_recessao_v2 = dupla | classe_recessao_ar1_v3 = simples,2.0
+classe_recessao_v2 = dupla (lenta não identificável) | classe_recessao_ar1_v3 = dupla,8.0
+classe_recessao_v2 = dupla (lenta não identificável) | classe_recessao_ar1_v3 = dupla (lenta não identificável),8.0
+classe_recessao_v2 = dupla (lenta não identificável) | classe_recessao_ar1_v3 = indistinto,0.0
+classe_recessao_v2 = dupla (lenta não identificável) | classe_recessao_ar1_v3 = simples,0.0
+classe_recessao_v2 = indistinto | classe_recessao_ar1_v3 = dupla,2.0
+classe_recessao_v2 = indistinto | classe_recessao_ar1_v3 = dupla (lenta não identificável),0.0
+classe_recessao_v2 = indistinto | classe_recessao_ar1_v3 = indistinto,0.0
+classe_recessao_v2 = indistinto | classe_recessao_ar1_v3 = simples,0.0
+classe_recessao_v2 = simples | classe_recessao_ar1_v3 = dupla,41.0
+classe_recessao_v2 = simples | classe_recessao_ar1_v3 = dupla (lenta não identificável),7.0
+classe_recessao_v2 = simples | classe_recessao_ar1_v3 = indistinto,3.0
+classe_recessao_v2 = simples | classe_recessao_ar1_v3 = simples,47.0

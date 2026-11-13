@@ -1,0 +1,38 @@
+{
+  "executado_em": "2026-11-11T15:27:06.372928+00:00",
+  "regras": {
+    "DT_MIN": 10,
+    "MAX_GAP_INTERP": 2,
+    "MAX_GAP_VAZAO": 3,
+    "JANELA_CONTADOR": 3,
+    "TOL_CONTADOR": 200,
+    "GAP_EVENTO": 2,
+    "DUR_MIN_EVENTO": 3,
+    "FATOR_GLITCH_VAZAO": 5,
+    "BASELINE_MIN": 60,
+    "PICO_APOS_FECHAR": 12,
+    "DY_MIN": 1.5,
+    "N_MIN_SUBIDA": 8,
+    "FRAC_INTERP_MAX": 0.2,
+    "REC_MAX": 72,
+    "REC_N_MIN": 18,
+    "RES_TEMPORAL": 10,
+    "R2_BOA": 0.9,
+    "DAICC": 2.0
+  },
+  "tratamentos": {
+    "2023": {
+      "1": "I100",
+      "2": "I60",
+      "3": "I30"
+    },
+    "2024": {
+      "1": "Î80",
+      "2": "Î60",
+      "3": "A(sh)",
+      "4": "Î100",
+      "5": "Î30"
+    }
+  },
+  "fonte": "data/processed/dataset_m2_{2023,2024,2025}.csv"
+}

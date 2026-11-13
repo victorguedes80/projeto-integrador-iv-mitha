@@ -1,0 +1,4 @@
+amostra,n,ar1:1 polo + componente rápida,ar1:2a ordem (com zero),ar1:indistinto,ar1:1a ordem,iid:1 polo + componente rápida,iid:2a ordem (com zero),iid:indistinto,iid:1a ordem,neff:1 polo + componente rápida,neff:1a ordem,neff:indistinto,neff:2a ordem (com zero),M1q_tau_mediana,M1q_theta_mediana,ar1:2a ordem (série),iid:2a ordem (série)
+principal,77,46,22,6,3,46,23,6,2,40,25,8,4,117.63226536491477,4.994816886255486,,
+todos_com_modelo_vazao,191,72,43,33,34,71,72,30,15,55,114,13,9,128.10679558301644,6.177864528252669,9.0,3.0
+so_vazao_reconstruida,50,8,14,12,13,8,29,10,1,5,38,3,4,118.35529849868774,6.201025169162081,3.0,2.0

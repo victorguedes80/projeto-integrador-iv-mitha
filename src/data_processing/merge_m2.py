@@ -235,10 +235,16 @@ def load_water_meter(root, season):
         print(f"  [aviso] water_meter{season}.csv incompleto")
         return None
     df = df[["timestamp_10min", "line", "water_volume"]].dropna(subset=["line"])
+    # Garante comparação numérica antes de usar max(); evita máximo lexicográfico
+    # caso uma coluna venha como texto por causa de registros inválidos mistos.
+    df["water_volume"] = pd.to_numeric(df["water_volume"], errors="coerce")
     # descarta linha #0 (medidor geral) — fica só com linhas de cultivo
     df = df[df["line"] >= 1]
-    # soma de volume por (timestamp, line) — várias medições na mesma janela
-    df = df.groupby(["timestamp_10min", "line"], as_index=False)["water_volume"].sum()
+    # current_volume é um CONTADOR ACUMULADO (série não-decrescente em >99,9%
+    # das leituras). Somar duas leituras da mesma janela de 10 min dobra o
+    # valor e cria picos/quedas espúrios. Usa-se a última leitura (máximo) da
+    # janela, que preserva a semântica de contador.
+    df = df.groupby(["timestamp_10min", "line"], as_index=False)["water_volume"].max()
     return df
 
 
