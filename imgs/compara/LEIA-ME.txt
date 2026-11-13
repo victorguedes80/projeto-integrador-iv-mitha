@@ -1,0 +1,13 @@
+Como rodar o script de comparação climática entre Fortaleza e Itália:
+
+O que você precisa:
+• Ter o arquivo dataset_m2_2024.csv na mesma pasta do script. Se quiser de 2025 é só mudar no código.
+• Ter as bibliotecas instaladas (pandas, numpy, matplotlib).
+• Estar conectado à internet (para buscar os dados de Fortaleza via API Open-Meteo).
+
+Como executar:
+Abra o terminal na pasta onde estão os arquivos e rode:
+• python cod_graf_comparacao.py
+
+O que ele vai gerar:
+O script vai buscar os dados de Fortaleza, cruzar com o ciclo diário da Itália e salvar uma imagem chamada comparacao_ciclo_diario_fortaleza.png na mesma pasta com os gráficos.
