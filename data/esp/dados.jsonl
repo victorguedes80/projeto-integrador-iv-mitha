@@ -151,3 +151,34 @@
 {"solo": {"ts": 1791923804, "adc": 1502, "do": 0, "pct": 100}, "chuva": {"ts": 1791923804, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1791922500, "ts_consulta": 1791923204, "temp": 27.5, "ur": 73}}
 {"solo": {"ts": 1791923864, "adc": 1488, "do": 0, "pct": 100}, "chuva": {"ts": 1791923864, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1791922500, "ts_consulta": 1791923204, "temp": 27.5, "ur": 73}}
 {"solo": {"ts": 1791923924, "adc": 1503, "do": 0, "pct": 100}, "chuva": {"ts": 1791923924, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1791922500, "ts_consulta": 1791923204, "temp": 27.5, "ur": 73}}
+{"solo": {"ts": 1792590327, "adc": 1378, "do": 0, "pct": 100}, "chuva": {"ts": 1792590327, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590387, "adc": 1438, "do": 0, "pct": 100}, "chuva": {"ts": 1792590387, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590448, "adc": 1498, "do": 0, "pct": 100}, "chuva": {"ts": 1792590448, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590508, "adc": 1425, "do": 0, "pct": 100}, "chuva": {"ts": 1792590508, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590568, "adc": 1431, "do": 0, "pct": 100}, "chuva": {"ts": 1792590568, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590628, "adc": 1451, "do": 0, "pct": 100}, "chuva": {"ts": 1792590628, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590688, "adc": 1229, "do": 0, "pct": 100}, "chuva": {"ts": 1792590688, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590748, "adc": 1216, "do": 0, "pct": 100}, "chuva": {"ts": 1792590748, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590808, "adc": 1237, "do": 0, "pct": 100}, "chuva": {"ts": 1792590808, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590868, "adc": 1237, "do": 0, "pct": 100}, "chuva": {"ts": 1792590868, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590928, "adc": 1338, "do": 0, "pct": 100}, "chuva": {"ts": 1792590928, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792590988, "adc": 1424, "do": 0, "pct": 100}, "chuva": {"ts": 1792590988, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792591048, "adc": 1395, "do": 0, "pct": 100}, "chuva": {"ts": 1792591048, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792591108, "adc": 1088, "do": 0, "pct": 100}, "chuva": {"ts": 1792591108, "adc": 4095, "do": 1, "pct": 0}, "estacao": null}
+{"solo": {"ts": 1792591179, "adc": 1168, "do": 0, "pct": 100}, "chuva": {"ts": 1792591179, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591239, "adc": 1083, "do": 0, "pct": 100}, "chuva": {"ts": 1792591239, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591299, "adc": 1014, "do": 0, "pct": 100}, "chuva": {"ts": 1792591299, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591359, "adc": 1279, "do": 0, "pct": 100}, "chuva": {"ts": 1792591359, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591419, "adc": 1040, "do": 0, "pct": 100}, "chuva": {"ts": 1792591419, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591479, "adc": 965, "do": 0, "pct": 100}, "chuva": {"ts": 1792591479, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591539, "adc": 950, "do": 0, "pct": 100}, "chuva": {"ts": 1792591539, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591599, "adc": 959, "do": 0, "pct": 100}, "chuva": {"ts": 1792591599, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591659, "adc": 942, "do": 0, "pct": 100}, "chuva": {"ts": 1792591659, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591719, "adc": 926, "do": 0, "pct": 100}, "chuva": {"ts": 1792591719, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591779, "adc": 935, "do": 0, "pct": 100}, "chuva": {"ts": 1792591779, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591839, "adc": 927, "do": 0, "pct": 100}, "chuva": {"ts": 1792591839, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591899, "adc": 931, "do": 0, "pct": 100}, "chuva": {"ts": 1792591899, "adc": 4095, "do": 1, "pct": 0}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792591959, "adc": 917, "do": 0, "pct": 100}, "chuva": {"ts": 1792591959, "adc": 2653, "do": 1, "pct": 60.2}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792592019, "adc": 960, "do": 0, "pct": 100}, "chuva": {"ts": 1792592019, "adc": 2460, "do": 1, "pct": 68.3}, "estacao": {"ts": 1792590300, "ts_consulta": 1792591167, "temp": 31.1, "ur": 57}}
+{"solo": {"ts": 1792592079, "adc": 910, "do": 0, "pct": 100}, "chuva": {"ts": 1792592079, "adc": 2368, "do": 1, "pct": 72.1}, "estacao": {"ts": 1792591200, "ts_consulta": 1792592067, "temp": 31.2, "ur": 57}}
+{"solo": {"ts": 1792592139, "adc": 915, "do": 0, "pct": 100}, "chuva": {"ts": 1792592139, "adc": 2406, "do": 1, "pct": 70.5}, "estacao": {"ts": 1792591200, "ts_consulta": 1792592067, "temp": 31.2, "ur": 57}}

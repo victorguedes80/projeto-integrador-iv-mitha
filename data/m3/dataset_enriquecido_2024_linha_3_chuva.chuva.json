@@ -1,0 +1,25 @@
+{
+  "source": "/home/anderson/Documentos/pi4/PI4comIOT/projeto-integrador-iv-mitha/data/m3/dataset_enriquecido_2024_linha_3.csv",
+  "output": "/home/anderson/Documentos/pi4/PI4comIOT/projeto-integrador-iv-mitha/data/m3/dataset_enriquecido_2024_linha_3_chuva.csv",
+  "url": "https://archive-api.open-meteo.com/v1/archive?latitude=44.809362&longitude=10.273168&start_date=2024-06-09&end_date=2024-10-02&hourly=precipitation&timezone=GMT&precipitation_unit=mm",
+  "requested_coordinates": {
+    "latitude": 44.809362,
+    "longitude": 10.273168
+  },
+  "grid_coordinates": {
+    "latitude": 44.815464,
+    "longitude": 10.293664
+  },
+  "timezone": "UTC",
+  "hourly_file": "src/tmp/open_meteo/open_meteo_151fabeb7120ab53_hourly.csv",
+  "raw_cache": "src/tmp/open_meteo/open_meteo_151fabeb7120ab53.json",
+  "column": "precipitation_mm",
+  "unit": "mm",
+  "meaning": "precipitação na janela da coleta atual até a próxima",
+  "approximation": "distribuição uniforme do total de cada hora; não é medição a cada 10 minutos",
+  "exogenous": true,
+  "note": "reanálise histórica Open-Meteo; não é medição local nem previsão operacional",
+  "attribution": "Weather data by Open-Meteo.com",
+  "valid_rows": 13023,
+  "wet_windows": 1462
+}
