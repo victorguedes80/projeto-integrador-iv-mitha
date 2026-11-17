@@ -380,13 +380,44 @@ python3 src/data/broker_mqtt/registros.py
 
 O script requer `paho-mqtt>=2.0`.
 
-### Testar sem o código
+### Monitorar com o MQTT Explorer
 
-Para ver as mensagens chegando ao broker, use o **MQTT Explorer** com:
-- o host acima e a porta `8883`;
-- TLS ligado;
-- o usuário `mitha-registros`;
-- o tópico `irrigacao/#`.
+O [MQTT Explorer](https://mqtt-explorer.com/) é um cliente MQTT gráfico e gratuito. Com ele, é possível ver as mensagens chegando ao broker em tempo real, sem rodar nenhum código. Ele é útil para testar o broker e o ESP32 de forma independente.
+
+**1. Criar a conexão**
+
+Abra o MQTT Explorer, clique em **+** (Connections) e preencha:
+
+| Campo | Valor |
+|---|---|
+| Name | `Mitha (Azure)` |
+| Protocol | `mqtt://` |
+| Host | `mitha-broker.chilecentral.cloudapp.azure.com` |
+| Port | `8883` |
+| Encryption (tls) | ligado |
+| Validate certificate | ligado |
+| Username | `mitha-registros` |
+| Password | senha do `mitha-registros` |
+
+**2. Definir o tópico**
+
+1. Clique em **ADVANCED**.
+2. Remova os tópicos padrão (`#` e `$SYS/#`).
+3. Adicione `irrigacao/#` e clique em **BACK**.
+
+> Atenção à grafia: o tópico é `irrigacao`, **sem** cedilha, **sem** til e com **um** "r". Tópicos MQTT diferenciam cada caractere.
+
+**3. Conectar**
+
+Clique em **SAVE** e depois em **CONNECT**. Com o ESP32 ligado, a árvore `irrigacao → esp32-01 → dados` aparece e é atualizada a cada minuto. Clique em `dados` para ver o JSON da última leitura e o histórico de mensagens.
+
+**Observações**
+
+- O usuário `mitha-registros` tem permissão apenas para **ler**. Tentativas de publicar por essa conexão são recusadas pelo broker, e isso é esperado.
+- Se a conexão falhar:
+  - **Timeout**: confira se a VM está ligada e se a porta `8883` está liberada no grupo de segurança de rede da Azure.
+  - **Not authorized / Bad username or password**: confira o usuário e a senha.
+- A árvore vazia com a conexão ativa indica que o broker está funcionando, mas o ESP32 não está publicando. Nesse caso, verifique o Monitor Serial do ESP32.
 
 ## Entregas
 
