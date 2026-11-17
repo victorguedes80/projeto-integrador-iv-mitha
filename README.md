@@ -255,6 +255,139 @@ data/processed/
 Desenvolvimento dos modelos
 ```
 
+## Coleta de Dados com ESP32 (IoT)
+
+Além do dataset do Mendeley, o MITHA coleta dados próprios em campo com um **ESP32**. As leituras são enviadas por **MQTT** para um broker **HiveMQ** hospedado na **Azure** e gravadas localmente por um script Python.
+
+### Arquitetura
+
+```text
+┌──────────────────────┐      MQTT + TLS (8883)      ┌───────────────────────────┐
+│ ESP32                │ ──────────────────────────► │ HiveMQ CE (Docker)        │
+│ • sensor de solo     │  irrigacao/esp32-01/dados   │ VM Ubuntu na Azure        │
+│ • sensor de chuva    │                             │ usuário/senha (File RBAC) │
+│ • Open-Meteo (HTTPS) │                             └─────────────┬─────────────┘
+└──────────────────────┘                                           │ MQTT + TLS
+                                                                   ▼
+                                                     ┌───────────────────────────┐
+                                                     │ registros.py              │
+                                                     │ grava em                  │
+                                                     │ data/esp/dados.jsonl      │
+                                                     └───────────────────────────┘
+```
+
+### Funcionamento do ESP32
+
+O firmware fica em `src/data/get_dados_esp/geralbroker.ino` e segue este ciclo:
+
+1. Conecta ao Wi-Fi (rede de 2,4 GHz) e sincroniza o relógio via NTP.
+2. Consulta a API **Open-Meteo** para obter a temperatura e a umidade relativa do ar em Fortaleza. Repete a consulta a cada **15 minutos**, com até 3 tentativas.
+3. Lê os sensores locais a cada **1 minuto**:
+   - **umidade do solo**: pinos AO 36 e DO 27;
+   - **chuva/molhamento**: pinos AO 39 e DO 26.
+4. Monta um JSON com as leituras e publica no tópico `irrigacao/esp32-01/dados`.
+5. Se o broker estiver indisponível, guarda a última leitura e publica assim que a conexão voltar.
+
+Exemplo de mensagem publicada:
+
+```json
+{
+  "solo":    {"ts": 1791914204, "adc": 2112, "do": 1, "pct": 79.5},
+  "chuva":   {"ts": 1791914204, "adc": 4095, "do": 1, "pct": 0},
+  "estacao": {"ts": 1791913500, "ts_consulta": 1791914202, "temp": 30, "ur": 56}
+}
+```
+
+| Campo | Descrição |
+|---|---|
+| `ts` | Timestamp Unix (UTC) da leitura |
+| `adc` | Valor bruto do conversor analógico (0–4095) |
+| `do` | Saída digital do módulo do sensor |
+| `pct` | Percentual estimado pela calibração provisória |
+| `estacao.ts` | Horário dos dados informado pela Open-Meteo |
+| `estacao.ts_consulta` | Horário em que o ESP fez a consulta |
+| `temp` / `ur` | Temperatura (°C) e umidade relativa do ar (%) |
+
+Se a consulta à Open-Meteo falhar, o campo `estacao` é enviado como `null`.
+
+### Broker MQTT
+
+O broker é o **HiveMQ Community Edition**, rodando em Docker numa VM Ubuntu da Azure (assinatura Azure for Students).
+
+| Item | Valor |
+|---|---|
+| Host | `mitha-broker.chilecentral.cloudapp.azure.com` |
+| Porta | `8883` (MQTT sobre TLS, certificado Let's Encrypt) |
+| Autenticação | Usuário e senha, via extensão HiveMQ File RBAC |
+| Tópico | `irrigacao/esp32-01/dados` |
+
+Usuários e permissões:
+
+| Usuário | Permissão | Usado por |
+|---|---|---|
+| `mitha-esp32` | publicar em `irrigacao/#` | ESP32 |
+| `mitha-registros` | assinar `irrigacao/#` | `registros.py` e ferramentas de teste |
+
+> As senhas **não** são versionadas. Peça-as a um integrante da equipe.
+
+### Configurar e gravar o ESP32
+
+1. Instale na IDE do Arduino:
+   - o pacote de placas **esp32 by Espressif**;
+   - as bibliotecas **PubSubClient** e **ArduinoJson** (v7).
+2. Na pasta do sketch, copie `secrets.example.h` para `secrets.h` e preencha os valores:
+
+   | Constante | Conteúdo |
+   |---|---|
+   | `WIFI_SSID` / `WIFI_PASS` | Nome e senha da rede Wi-Fi (2,4 GHz) |
+   | `MQTT_HOST_S` | Endereço do broker |
+   | `MQTT_USER_S` / `MQTT_PASS_S` | Usuário `mitha-esp32` e a senha dele |
+
+3. Grave o firmware e abra o Monitor Serial em **115200**. O esperado é ver `MQTT conectado` e, a cada minuto, `--- MQTT publicado ---`.
+
+O arquivo `secrets.h` está no `.gitignore` e **nunca** deve ser enviado ao GitHub.
+
+Códigos de erro mais comuns no Monitor Serial:
+
+| Mensagem | Causa provável |
+|---|---|
+| Fica em `Conectando Wi-Fi.....` | SSID ou senha errados, ou rede de 5 GHz |
+| `Falha MQTT, estado: -2` | Host errado, porta 8883 bloqueada ou VM desligada |
+| `Falha MQTT, estado: 4` | Senha do `mitha-esp32` incorreta |
+| `Falha MQTT, estado: 5` | Usuário sem permissão (usuário errado) |
+
+### Gravar os dados recebidos
+
+O script `src/data/broker_mqtt/registros.py` assina o tópico e acrescenta cada mensagem como uma linha em `data/esp/dados.jsonl`. As credenciais são lidas de variáveis de ambiente.
+
+No Windows (PowerShell):
+
+```powershell
+$env:HIVEMQ_HOST="mitha-broker.chilecentral.cloudapp.azure.com"
+$env:HIVEMQ_USER="mitha-registros"
+$env:HIVEMQ_PASS="<senha>"
+python src/data/broker_mqtt/registros.py
+```
+
+No Linux:
+
+```bash
+export HIVEMQ_HOST="mitha-broker.chilecentral.cloudapp.azure.com"
+export HIVEMQ_USER="mitha-registros"
+export HIVEMQ_PASS="<senha>"
+python3 src/data/broker_mqtt/registros.py
+```
+
+O script requer `paho-mqtt>=2.0`.
+
+### Testar sem o código
+
+Para ver as mensagens chegando ao broker, use o **MQTT Explorer** com:
+- o host acima e a porta `8883`;
+- TLS ligado;
+- o usuário `mitha-registros`;
+- o tópico `irrigacao/#`.
+
 ## Entregas
 
 O desenvolvimento do projeto é organizado de forma incremental ao longo da disciplina.

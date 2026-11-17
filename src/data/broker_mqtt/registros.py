@@ -1,14 +1,25 @@
-
 import json
+import os
+import ssl
+import sys
 from pathlib import Path
 import paho.mqtt.client as mqtt
 
-PORTA = 1883
-BROKER = "10.247.213.163"
+# Broker HiveMQ na Azure (TLS)
+PORTA = 8883
 TOPICO = "irrigacao/esp32-01/dados"
 
+# Credenciais lidas de variaveis de ambiente (nao versionar senhas)
+try:
+    BROKER = os.environ["HIVEMQ_HOST"]
+    USUARIO = os.environ["HIVEMQ_USER"]
+    SENHA = os.environ["HIVEMQ_PASS"]
+except KeyError as falta:
+    sys.exit(f"Variavel de ambiente {falta} nao definida. Veja o README.")
+
 # Caminho do arquivo de registros
-RAIZ = Path(__file__).resolve().parents[2]
+# registros.py -> broker_mqtt -> data -> src -> raiz do repositorio
+RAIZ = Path(__file__).resolve().parents[3]
 ARQUIVO = RAIZ / "data" / "esp" / "dados.jsonl"
 
 ARQUIVO.parent.mkdir(parents=True, exist_ok=True)
@@ -34,7 +45,13 @@ def ao_receber(client, userdata, msg):
     except OSError as erro:
         print("Erro ao salvar registro:", erro)
 
-cliente = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+cliente = mqtt.Client(
+    mqtt.CallbackAPIVersion.VERSION2,
+    client_id="mitha-registros"
+)
+cliente.username_pw_set(USUARIO, SENHA)
+cliente.tls_set(tls_version=ssl.PROTOCOL_TLS_CLIENT)
+
 cliente.on_connect = ao_conectar
 cliente.on_message = ao_receber
 

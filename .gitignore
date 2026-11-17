@@ -53,3 +53,6 @@ Desktop.ini
 .vscode/
 .idea/
 
+#secrets
+src/data/get_dados_esp/secrets.h
+

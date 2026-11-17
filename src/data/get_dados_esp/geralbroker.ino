@@ -1,30 +1,33 @@
-
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <time.h>
+#include "secrets.h"
 
 // ===============================
 // WIFI
 // ===============================
 
-const char* ssid = "."; //2.5ghz
-const char* password = "Omaiusculo";
+const char* ssid = WIFI_SSID; //  rede de 2.4ghz
+const char* password = WIFI_PASS;
 
 // ===============================
 // MQTT
 // ===============================
 
-// IP do computador onde roda o Mosquitto
-const char* MQTT_HOST = "10.247.213.163";
-const int MQTT_PORT = 1883;
+// Broker HiveMQ na Azure (TLS)
+const char* MQTT_HOST = MQTT_HOST_S;
+const int MQTT_PORT = 8883;
+const char* MQTT_USER = MQTT_USER_S;
+const char* MQTT_PASS = MQTT_PASS_S;
 
 const char* MQTT_CLIENT_ID = "esp32-irrigacao-01";
 const char* MQTT_TOPIC = "irrigacao/esp32-01/dados";
 
-WiFiClient mqttWifi;
+
+WiFiClientSecure mqttWifi;
 PubSubClient mqtt(mqttWifi);
 
 const unsigned long MQTT_RETRY = 5UL * 1000;
@@ -217,7 +220,7 @@ void verificarMQTT() {
 
   Serial.println("Conectando ao MQTT...");
 
-  if (mqtt.connect(MQTT_CLIENT_ID)) {
+  if (mqtt.connect(MQTT_CLIENT_ID, MQTT_USER, MQTT_PASS)) {
     Serial.println("MQTT conectado");
   } else {
     Serial.printf(
@@ -465,10 +468,11 @@ void setup() {
 
   analogReadResolution(12);
 
-  // Configura MQTT
+  // Configura MQTT (TLS)
+  mqttWifi.setInsecure();          // prototipo: nao valida o certificado
   mqtt.setServer(MQTT_HOST, MQTT_PORT);
   mqtt.setBufferSize(512);
-  mqtt.setSocketTimeout(2);
+  mqtt.setSocketTimeout(10);       // TLS precisa de mais tempo
 
   // Wi-Fi
   WiFi.mode(WIFI_STA);
