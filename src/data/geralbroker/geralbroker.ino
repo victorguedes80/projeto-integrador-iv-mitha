@@ -4,6 +4,9 @@
 #include <ArduinoJson.h>
 #include <PubSubClient.h>
 #include <time.h>
+#include <sys/time.h>
+#include <esp_sntp.h>
+#include <Preferences.h>
 #include "secrets.h"
 
 // ===============================
@@ -43,7 +46,8 @@ const char* url =
   "https://api.open-meteo.com/v1/forecast"
   "?latitude=-3.73&longitude=-38.53"
   "&current=temperature_2m,relative_humidity_2m"
-  "&timezone=America%2FFortaleza";
+  "&timezone=America%2FFortaleza"
+  "&timeformat=unixtime";       // horarios em Unix UTC
 
 // ===============================
 // PINOS
@@ -102,7 +106,8 @@ struct LeituraSensor {
 
 struct LeituraEstacao {
   uint32_t ts = 0;
-  uint32_t tsConsulta = 0;
+  uint32_t tsConsulta = 0;      // 0 = relogio ainda nao sincronizado
+  uint32_t msConsulta = 0;      // millis() no momento da consulta
   float temperatura = 0;
   float umidadeRelativa = 0;
   bool disponivel = false;
@@ -112,8 +117,31 @@ LeituraSensor solo;
 LeituraSensor chuva;
 LeituraEstacao estacao;
 
-// Indica que ha dados locais para publicar
-bool publicacaoPendente = false;
+// ===============================
+// FILA OFFLINE
+// ===============================
+
+// Cada registro guarda uma leitura completa.
+// Sem NTP, ts fica 0 e o horario e reconstruido
+// depois a partir de ms (millis() da leitura).
+
+struct Registro {
+  uint32_t ms = 0;
+  LeituraSensor solo;
+  LeituraSensor chuva;
+  LeituraEstacao estacao;
+};
+
+// 120 leituras = 2 horas sem conexao (1 por minuto)
+const int FILA_MAX = 120;
+
+// Maximo de envios por volta do loop,
+// para nao travar as leituras
+const int ENVIOS_POR_LOOP = 5;
+
+Registro fila[FILA_MAX];
+int filaInicio = 0;
+int filaTamanho = 0;
 
 // ===============================
 // TIMESTAMP UNIX
@@ -130,48 +158,197 @@ uint32_t obterUnix() {
   return (uint32_t)agora;
 }
 
-// Converte horario local da Open-Meteo para timestamp Unix UTC.
+// Converte um instante de millis() em timestamp Unix,
+// usando o relogio atual como referencia.
+// Retorna 0 se o relogio ainda nao foi sincronizado.
 
-uint32_t converterHorarioMeteo(const char* horario) {
-  int ano, mes, dia, hora, minuto;
+uint32_t reconstruirUnix(uint32_t ms) {
+  uint32_t agora = obterUnix();
 
-  if (sscanf(
-        horario,
-        "%d-%d-%dT%d:%d",
-        &ano, &mes, &dia,
-        &hora, &minuto
-      ) != 5) {
+  if (agora == 0) {
     return 0;
   }
 
-  if (ano < 2020 ||
-      mes < 1 || mes > 12 ||
-      dia < 1 || dia > 31 ||
-      hora < 0 || hora > 23 ||
-      minuto < 0 || minuto > 59) {
-    return 0;
+  // Subtracao sem sinal: funciona mesmo
+  // quando millis() reinicia (a cada ~49 dias)
+  uint32_t decorrido = (millis() - ms) / 1000;
+
+  return agora - decorrido;
+}
+
+// ===============================
+// NTP
+// ===============================
+
+bool ntpIniciado = false;
+
+// Vira true quando o NTP acerta o relogio pela primeira vez
+volatile bool ntpSincronizado = false;
+
+// Chamada pelo ESP32 a cada sincronizacao NTP bem-sucedida
+void aoSincronizarNTP(struct timeval* tv) {
+  ntpSincronizado = true;
+}
+
+// Inicia o cliente NTP uma unica vez.
+// Depois disso, o proprio ESP32 tenta sincronizar
+// sozinho em segundo plano, sem precisar chamar de novo.
+
+void iniciarNTP() {
+  if (ntpIniciado) {
+    return;
   }
 
-  struct tm data = {};
+  // Fuso de Fortaleza (UTC-3, sem horario de verao).
+  // O timestamp Unix continua em UTC; o fuso so afeta
+  // a exibicao do horario local no Monitor Serial.
+  sntp_set_time_sync_notification_cb(aoSincronizarNTP);
 
-  data.tm_year = ano - 1900;
-  data.tm_mon = mes - 1;
-  data.tm_mday = dia;
-  data.tm_hour = hora;
-  data.tm_min = minuto;
-  data.tm_sec = 0;
-  data.tm_isdst = 0;
+  configTzTime(
+    "<-03>3",
+    "pool.ntp.org",
+    "time.google.com",
+    "a.st1.ntp.br"
+  );
 
-  // timegm interpreta a data como UTC.
-  // Como UTC-3, +3 horas.
-  time_t resultado = mktime(&data);
+  ntpIniciado = true;
+  Serial.println("Cliente NTP iniciado");
+}
 
-  if (resultado < 0 ||
-      resultado > 0xFFFFFFFFLL) {
-    return 0;
+// ===============================
+// HORA PELO COMPUTADOR (SEM NTP)
+// ===============================
+
+// Ordem de prioridade do relogio:
+//   1. NTP (quando a rede permitir);
+//   2. hora digitada no Monitor Serial;
+//   3. hora da compilacao, so no 1o boot apos gravar.
+// Nenhum programa extra e necessario no computador.
+
+// Tempo medio entre compilar e o ESP comecar a rodar
+// (compilacao final + upload + boot). Ajuste se necessario.
+const uint32_t ATRASO_GRAVACAO_S = 20;
+
+// Dias desde 1970-01-01 (calendario gregoriano)
+int32_t diasDesdeEpoch(int ano, int mes, int dia) {
+  ano -= (mes <= 2);
+  int era = (ano >= 0 ? ano : ano - 399) / 400;
+  int anoEra = ano - era * 400;
+  int diaAno = (153 * (mes > 2 ? mes - 3 : mes + 9) + 2) / 5 + dia - 1;
+  int diaEra = anoEra * 365 + anoEra / 4 - anoEra / 100 + diaAno;
+  return era * 146097 + diaEra - 719468;
+}
+
+// Converte data e hora de Fortaleza (UTC-3) em Unix UTC
+uint32_t fortalezaParaUnix(int ano, int mes, int dia,
+                           int hora, int minuto, int segundo) {
+  return (uint32_t)diasDesdeEpoch(ano, mes, dia) * 86400UL
+         + hora * 3600UL + minuto * 60UL + segundo
+         + 3 * 3600UL;
+}
+
+void definirRelogio(uint32_t ts, const char* origem) {
+  struct timeval tv;
+  tv.tv_sec = (time_t)ts;
+  tv.tv_usec = 0;
+  settimeofday(&tv, nullptr);
+
+  Serial.printf(
+    "Relogio acertado (%s): %lu\n",
+    origem,
+    (unsigned long)ts
+  );
+}
+
+// Hora em que este firmware foi compilado,
+// no relogio do computador (Fortaleza)
+uint32_t horaDaCompilacao() {
+  char nomeMes[4];
+  int dia, ano, hora, minuto, segundo;
+
+  sscanf(__DATE__, "%3s %d %d", nomeMes, &dia, &ano);
+  sscanf(__TIME__, "%d:%d:%d", &hora, &minuto, &segundo);
+
+  const char* meses = "JanFebMarAprMayJunJulAugSepOctNovDec";
+  int mes = (strstr(meses, nomeMes) - meses) / 3 + 1;
+
+  return fortalezaParaUnix(ano, mes, dia, hora, minuto, segundo)
+         + ATRASO_GRAVACAO_S;
+}
+
+// True apenas no primeiro boot depois de gravar este firmware.
+// Nos boots seguintes, a hora da compilacao ja esta velha.
+bool primeiroBootAposGravar() {
+  Preferences prefs;
+  prefs.begin("mitha", false);
+
+  String atual = String(__DATE__) + " " + __TIME__;
+  bool primeiro = (prefs.getString("build", "") != atual);
+
+  if (primeiro) {
+    prefs.putString("build", atual);
   }
 
-  return (uint32_t)resultado;
+  prefs.end();
+  return primeiro;
+}
+
+char bufferSerial[24];
+int tamanhoBufferSerial = 0;
+
+// Aceita, no Monitor Serial:
+//   "2026-11-18 12:05:30" ou "2026-11-18 12:05" (Fortaleza)
+//   "T1795000000" (Unix UTC)
+void aplicarHoraSerial(const char* linha) {
+  if (ntpSincronizado) {
+    Serial.println("NTP ja sincronizado: hora digitada ignorada");
+    return;
+  }
+
+  uint32_t ts = 0;
+  int ano, mes, dia, hora, minuto, segundo = 0;
+
+  if (linha[0] == 'T') {
+    ts = strtoul(linha + 1, nullptr, 10);
+  } else if (sscanf(linha, "%d-%d-%d %d:%d:%d",
+                    &ano, &mes, &dia,
+                    &hora, &minuto, &segundo) >= 5) {
+    ts = fortalezaParaUnix(ano, mes, dia, hora, minuto, segundo);
+  }
+
+  // Ignora valores claramente invalidos
+  if (ts < 1700000000UL) {
+    Serial.println("Formato invalido. Use: AAAA-MM-DD HH:MM:SS");
+    return;
+  }
+
+  definirRelogio(ts, "Monitor Serial");
+}
+
+// Le a serial sem bloquear o loop
+void lerHoraSerial() {
+  while (Serial.available() > 0) {
+    char c = (char)Serial.read();
+
+    if (c == '\r') {
+      continue;
+    }
+
+    if (c == '\n') {
+      bufferSerial[tamanhoBufferSerial] = '\0';
+      aplicarHoraSerial(bufferSerial);
+      tamanhoBufferSerial = 0;
+      continue;
+    }
+
+    // Linha longa demais: descarta
+    if (tamanhoBufferSerial >= (int)sizeof(bufferSerial) - 1) {
+      tamanhoBufferSerial = 0;
+      continue;
+    }
+
+    bufferSerial[tamanhoBufferSerial++] = c;
+  }
 }
 
 // ===============================
@@ -234,41 +411,70 @@ void verificarMQTT() {
 // PUBLICACAO MQTT
 // ===============================
 
-bool publicarMQTT() {
+bool publicarMQTT(Registro& r) {
   if (!mqtt.connected()) {
     return false;
+  }
+
+  // Completa os timestamps de leituras feitas
+  // antes de o relogio sincronizar
+  bool reconstruido = false;
+
+  if (r.solo.ts == 0) {
+    uint32_t ts = reconstruirUnix(r.ms);
+
+    // Relogio ainda sem NTP: espera para enviar
+    if (ts == 0) {
+      return false;
+    }
+
+    r.solo.ts = ts;
+    r.chuva.ts = ts;
+    reconstruido = true;
+  }
+
+  if (r.estacao.disponivel &&
+      r.estacao.tsConsulta == 0) {
+    r.estacao.tsConsulta =
+      reconstruirUnix(r.estacao.msConsulta);
   }
 
   JsonDocument doc;
 
   // SOLO
-  doc["solo"]["ts"] = solo.ts;
-  doc["solo"]["adc"] = solo.adc;
-  doc["solo"]["do"] = solo.digital;
+  doc["solo"]["ts"] = r.solo.ts;
+  doc["solo"]["adc"] = r.solo.adc;
+  doc["solo"]["do"] = r.solo.digital;
   doc["solo"]["pct"] =
-    roundf(solo.percentual * 10.0f) / 10.0f;
+    roundf(r.solo.percentual * 10.0f) / 10.0f;
 
   // CHUVA
-  doc["chuva"]["ts"] = chuva.ts;
-  doc["chuva"]["adc"] = chuva.adc;
-  doc["chuva"]["do"] = chuva.digital;
+  doc["chuva"]["ts"] = r.chuva.ts;
+  doc["chuva"]["adc"] = r.chuva.adc;
+  doc["chuva"]["do"] = r.chuva.digital;
   doc["chuva"]["pct"] =
-    roundf(chuva.percentual * 10.0f) / 10.0f;
+    roundf(r.chuva.percentual * 10.0f) / 10.0f;
 
   // ESTACAO
-  if (estacao.disponivel) {
-    doc["estacao"]["ts"] = estacao.ts;
+  if (r.estacao.disponivel) {
+    doc["estacao"]["ts"] = r.estacao.ts;
 
     doc["estacao"]["ts_consulta"] =
-      estacao.tsConsulta;
+      r.estacao.tsConsulta;
 
     doc["estacao"]["temp"] =
-      roundf(estacao.temperatura * 10.0f) / 10.0f;
+      roundf(r.estacao.temperatura * 10.0f) / 10.0f;
 
     doc["estacao"]["ur"] =
-      roundf(estacao.umidadeRelativa * 10.0f) / 10.0f;
+      roundf(r.estacao.umidadeRelativa * 10.0f) / 10.0f;
   } else {
     doc["estacao"] = nullptr;
+  }
+
+  // Indica que o horario foi calculado depois
+  // (leitura feita sem NTP)
+  if (reconstruido) {
+    doc["ts_reconstruido"] = true;
   }
 
   char mensagem[512];
@@ -282,7 +488,9 @@ bool publicarMQTT() {
   if (tamanho == 0 ||
       tamanho >= sizeof(mensagem)) {
     Serial.println("Erro: JSON muito grande");
-    return false;
+
+    // Descarta o registro para nao travar a fila
+    return true;
   }
 
   bool sucesso = mqtt.publish(
@@ -303,12 +511,68 @@ bool publicarMQTT() {
 }
 
 // ===============================
+// FILA: INSERIR E ENVIAR
+// ===============================
+
+void enfileirar() {
+  // Fila cheia: descarta a leitura mais antiga
+  if (filaTamanho == FILA_MAX) {
+    filaInicio = (filaInicio + 1) % FILA_MAX;
+    filaTamanho--;
+
+    Serial.println("Fila cheia: leitura mais antiga descartada");
+  }
+
+  int fim = (filaInicio + filaTamanho) % FILA_MAX;
+
+  fila[fim].ms = millis();
+  fila[fim].solo = solo;
+  fila[fim].chuva = chuva;
+  fila[fim].estacao = estacao;
+
+  filaTamanho++;
+
+  Serial.printf(
+    "Leituras na fila: %d/%d\n",
+    filaTamanho,
+    FILA_MAX
+  );
+}
+
+// Envia as leituras na ordem em que foram feitas.
+// Para no primeiro erro e tenta de novo no proximo loop.
+
+void enviarFila() {
+  int enviados = 0;
+
+  while (filaTamanho > 0 &&
+         enviados < ENVIOS_POR_LOOP &&
+         mqtt.connected()) {
+
+    if (!publicarMQTT(fila[filaInicio])) {
+      break;
+    }
+
+    filaInicio = (filaInicio + 1) % FILA_MAX;
+    filaTamanho--;
+    enviados++;
+
+    // Processa o MQTT entre envios seguidos
+    mqtt.loop();
+  }
+}
+
+// ===============================
 // LEITURA DOS SENSORES
 // ===============================
 
 void lerSensores() {
+  // Sem NTP, ts = 0: o horario sera
+  // reconstruido antes do envio
+  uint32_t ts = obterUnix();
+
   // Solo
-  solo.ts = obterUnix();
+  solo.ts = ts;
   solo.adc = analogRead(SOLO_AO);
   solo.digital = digitalRead(SOLO_DO);
 
@@ -316,7 +580,7 @@ void lerSensores() {
     calcularUmidadeSolo(solo.adc);
 
   // Chuva
-  chuva.ts = obterUnix();
+  chuva.ts = ts;
   chuva.adc = analogRead(RAIN_AO);
   chuva.digital = digitalRead(RAIN_DO);
 
@@ -341,8 +605,8 @@ void lerSensores() {
     chuva.percentual
   );
 
-  // Solicita publicacao do conjunto completo
-  publicacaoPendente = true;
+  // Guarda a leitura completa para envio
+  enfileirar();
 }
 
 // ===============================
@@ -365,7 +629,9 @@ bool consultarMeteo() {
   }
 
   // Instante de inicio da consulta
+  // (tsConsulta = 0 se ainda nao houver NTP)
   uint32_t tsConsulta = obterUnix();
+  uint32_t msConsulta = millis();
 
   int status = http.GET();
 
@@ -408,13 +674,12 @@ bool consultarMeteo() {
     return false;
   }
 
-  const char* horarioAPI =
-    doc["current"]["time"] | "";
-
+  // Com timeformat=unixtime, a API ja envia
+  // o horario como timestamp Unix (UTC)
   uint32_t tsDados =
-    converterHorarioMeteo(horarioAPI);
+    doc["current"]["time"] | 0UL;
 
-  if (tsDados == 0 || tsConsulta == 0) {
+  if (tsDados == 0) {
     Serial.println("Timestamp meteorologico invalido");
     return false;
   }
@@ -422,6 +687,7 @@ bool consultarMeteo() {
   // Atualiza somente com resposta valida
   estacao.ts = tsDados;
   estacao.tsConsulta = tsConsulta;
+  estacao.msConsulta = msConsulta;
 
   estacao.temperatura =
     tempJson.as<float>();
@@ -493,13 +759,7 @@ void setup() {
   if (WiFi.status() == WL_CONNECTED) {
     Serial.println("\nWi-Fi conectado");
 
-    // Fortaleza UTC-3
-    configTime(
-      -3 * 3600,
-      0,
-      "pool.ntp.org",
-      "time.google.com"
-    );
+    iniciarNTP();
 
     struct tm horario;
 
@@ -519,6 +779,22 @@ void setup() {
     Serial.println("\nFalha na conexao Wi-Fi");
   }
 
+  // Sem NTP no boot: usa a hora da compilacao
+  // (so no primeiro boot apos gravar) ou pede
+  // para digitar a hora no Monitor Serial
+  bool primeiroBoot = primeiroBootAposGravar();
+
+  if (obterUnix() == 0) {
+    if (primeiroBoot) {
+      definirRelogio(horaDaCompilacao(), "hora da compilacao");
+    } else {
+      Serial.println(
+        "Sem hora valida. Digite no Monitor Serial "
+        "(horario de Fortaleza): AAAA-MM-DD HH:MM:SS"
+      );
+    }
+  }
+
   // Inicia a consulta meteorologica
   // imediatamente no primeiro loop
   tentativas = 0;
@@ -532,6 +808,16 @@ void setup() {
 // ===============================
 
 void loop() {
+  // Hora enviada pelo computador (USB)
+  lerHoraSerial();
+
+  // Se o ESP ligou sem Wi-Fi, inicia o NTP
+  // assim que a conexao aparecer
+  if (!ntpIniciado &&
+      WiFi.status() == WL_CONNECTED) {
+    iniciarNTP();
+  }
+
   // Mantem o MQTT conectado
   verificarMQTT();
 
@@ -623,13 +909,7 @@ void loop() {
   // PUBLICACAO MQTT
   // --------------------------------
 
-  // Mantem uma publicacao pendente
-  // caso o broker esteja desconectado
-  if (publicacaoPendente &&
-      mqtt.connected()) {
-
-    if (publicarMQTT()) {
-      publicacaoPendente = false;
-    }
-  }
+  // Envia as leituras acumuladas assim que
+  // houver broker conectado e relogio valido
+  enviarFila();
 }
